@@ -5215,7 +5215,7 @@ $ curl -x james:[cats@myproxy](mailto:cats@myproxy).com:8080 https://www.example
 
 $ curl -X POST https://www.example.com
 
-上面命令对https://www.example.com发出 POST 请求。
+上面命令对 https://www.example.com 发出 POST 请求。
 
 ### 8.shell 基础
 
