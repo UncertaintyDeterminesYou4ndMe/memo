@@ -8542,6 +8542,66 @@ ALTER TABLE `ad_platform_two_jump_statistics_dt`
 DROP KEY `idx_dt`,ADD KEY `idx_dt_plan_id`(`dt`,`plan_id`) USING BTREE;
 ```
 
+### binlog 命令
+```
+# 一、配置信息
+# 是否启用binlog日志
+show variables like 'log_bin';
+
+# 查看详细的日志配置信息
+show global variables like '%log%';
+
+# mysql数据存储目录
+show variables like '%dir%';
+
+# 查看binlog的目录
+show global variables like "%log_bin%";
+
+# 查看当前服务器使用的binlog文件及大小
+show binary logs;
+
+# 查看主服务器使用的binlog文件及大小
+
+
+# 二、管理binlog
+# 查看所有binlog的日志列表
+show master logs;
+
+# 查看最后一个binlog日志的编号名称及最后一个时间结束的位置pos
+show master status;
+
+# 刷新binlog，会生成一个新编号的binlog日志文件
+flush log;
+
+# 清空所有binlog日志（慎用）
+reset master;
+
+# 设置binlog文件保存事件，过期删除，单位天
+set global expire_log_days=3; 
+
+# 删除指定日期前的日志索引中binlog日志文件
+purge master logs before '2019-03-09 14:00:00';
+
+# 删除指定日志文件
+purge master logs to 'master.000003';
+
+# 删除slave的中继日志
+reset slave;
+
+# 三、事件查询命令
+# 查看 binlog 内容
+show binlog events;
+
+# 查看具体一个binlog文件的内容 （in 后面为binlog的文件名）
+show binlog events in 'master.000001';
+
+# IN 'log_name' ：指定要查询的binlog文件名(不指定就是第一个binlog文件)
+# FROM pos ：指定从哪个pos起始点开始查起(不指定就是从整个文件首个pos点开始算)
+# LIMIT [offset,] ：偏移量(不指定就是0)
+# row_count ：查询总条数(不指定就是所有行)
+show binlog events [IN 'log_name'] [FROM pos] [LIMIT [offset,] row_count];
+```
+
 ## 三十二、StarRocks
 
 ### 原理
