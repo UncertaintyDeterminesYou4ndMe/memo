@@ -4081,7 +4081,6 @@ blockCache 块缓存 内存存储 的 数据淘汰机制 基于 LRU算法
 
 ![image](https://github.com/UncertaintyDeterminesYou4ndMe/memo/assets/72533078/712e1d3f-242d-452b-a301-e0d1835bfebe)
 
-
 #### JVM 进程总内存（Total Process Memory）
 
 该区域表示在容器环境下，TaskManager 所在 JVM 的最大可用的内存配额，包含了本文后续介绍的所有内存区域，超用时可能被强制结束进程。我们可以通过 taskmanager.memory.process.size 参数控制它的大小。
@@ -4183,7 +4182,6 @@ JVM Metaspace 主要保存了加载的类和方法的元数据，Flink 配置的
 5、sink任务收到jobmanager的确认信息，正式提交这段时间的数据
 外部kafka关闭事务，提交的数据可以正常消费了。
 ```
-
 
 
 ### flink checkpoint & savepoint
@@ -4409,7 +4407,10 @@ if __name__ == '__main__':
     exit(check_running(args))
 ```
 
-
+### 生产场景
+Flink的延迟指标有一个问题，比如你实际任务并没有延迟，但是显示的延迟指标是你最后一条变更数据的时间和当前时间的差值，作为的延迟指标。如果没有新的数据更新，延迟就会一直变大。
+当网络出现问题，或者丢包很严重的时候，binlog可能订阅不到，此时延迟应该增大。但是现在flink的延迟是不增大的。
+基于MySQL的心跳机制，做延迟指标更新。当Binlog没有任何变更的时候，通过mysql hearbeat来更新延迟（mysql heatbeat在没有任何变更的时候，默认是15s一次发一次心跳包），因此只要延迟在15秒以内波动都是正常的
 
 
 
