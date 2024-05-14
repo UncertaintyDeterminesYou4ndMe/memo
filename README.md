@@ -8628,11 +8628,12 @@ show binlog events [IN 'log_name'] [FROM pos] [LIMIT [offset,] row_count];
 ##### 示意图
 示例数据表
 假设我们有一个简单的数据表，包含三列：ID（固定长度整数），Name（可变长度字符串），和Age（固定长度整数），表中有4行数据：
-ID	Name	Age
-1	Alice	30
-2	Bob	25
-3	Charlie	35
-4	David	NULL
+|ID	|Name	|Age
+|-	|-	|-
+|1	|Alice	|30
+|2	|Bob	|25
+|3	|Charlie	|35
+|4	|David	|NULL
 
 堆外内存布局
 元数据列布局
