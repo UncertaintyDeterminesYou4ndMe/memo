@@ -8542,6 +8542,9 @@ indices.memory.index_buffer_size: 30%
 ALTER TABLE `ad_platform_two_jump_statistics_dt` 
 DROP KEY `idx_dt`,ADD KEY `idx_dt_plan_id`(`dt`,`plan_id`) USING BTREE;
 ```
+```
+UPDATE crowd_es_task_record set `status` = 'INIT' WHERE `status` = 'RUNNING';
+```
 
 ### binlog 命令
 ```
