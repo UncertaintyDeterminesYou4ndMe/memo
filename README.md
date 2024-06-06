@@ -6134,7 +6134,7 @@ Alt+H 打开 “帮助” 菜单（help）
 另外一些小技巧包括：在终端窗口命令提示符下，连续按两次 Tab 键、或者连续按三次 Esc 键、或者按 Ctrl+I 组合键，将显示所有的命令及工具名称。Application 键即位置在键盘上右 Ctrl 键左边的那个键，作用相当于单击鼠标右键。
 ```
 
-### 11.hadoop 操作
+### 11.hadoop 修改权限操作
 
 ```bash
 sudo -u hdfs hadoop fs -chown hduser8009:supergroup /user/hduser8009/history/userlabel
