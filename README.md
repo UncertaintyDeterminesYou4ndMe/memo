@@ -8725,3 +8725,12 @@ curl 127.0.0.1:8040/metrics | grep "^starrocks_be_.*_mem_bytes"
 #### 配置项解读
 存算分离本地盘pk索引（persistent目录下）的淘汰策略：
 当磁盘占用超过水位线：be配置 starlet_cache_evict_low_water时，会开始执行索引evict，evict的条件是index在一段时间（be.conf lake_local_pk_index_unused_threshold_seconds）内没有被使用过，也就是这个tablet在这段时间内没有导入过，那这个索引就可以被删除掉。
+##### debug
+be配置 sys_log_verbose_modules 设置成 * 
+fe配置 sys_log_level 设置成 debug
+##### jemalloc
+FE 的配置项 JAVA_OPTS_FOR_JDK_9
+改成  
+```
+"-Dlog4j2.formatMsgNoLookups=true -Xmx20g -XX:MaxDirectMemorySize=1g -XX:+UseMembar -XX:+UseStringDeduplication -XX:+UseG1GC -Xlog:gc*:file=${STARROCKS_HOME}/log/fe.gc.log.$DATE:time -XX:+PrintConcurrentLocks"
+```
