@@ -8734,3 +8734,5 @@ FE 的配置项 JAVA_OPTS_FOR_JDK_9
 ```
 "-Dlog4j2.formatMsgNoLookups=true -Xmx20g -XX:MaxDirectMemorySize=1g -XX:+UseMembar -XX:+UseStringDeduplication -XX:+UseG1GC -Xlog:gc*:file=${STARROCKS_HOME}/log/fe.gc.log.$DATE:time -XX:+PrintConcurrentLocks"
 ```
+
+JAVA_OPTS_FOR_JDK_11=" -server -XX:+UnlockExperimentalVMOptions -XX:InitiatingHeapOccupancyPercent=90  -Dlog4j2.formatMsgNoLookups=true -Xmx22G -Xms22G -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:StringDeduplicationAgeThreshold=7  -XX:G1HeapRegionSize=16m -XX:G1HeapWastePercent=20 -XX:G1MixedGCLiveThresholdPercent=70  -XX:MetaspaceSize=256m -XX:MaxTenuringThreshold=15  -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -Xlog:gc*:${LOG_DIR}/fe.gc.log.$DATE:time"
