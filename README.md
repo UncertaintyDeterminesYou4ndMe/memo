@@ -8545,6 +8545,37 @@ DROP KEY `idx_dt`,ADD KEY `idx_dt_plan_id`(`dt`,`plan_id`) USING BTREE;
 ```
 UPDATE crowd_es_task_record set `status` = 'INIT' WHERE `status` = 'RUNNING';
 ```
+```
+# 常用函数
+1. HOUR(DATE_SUB(NOW(), INTERVAL 1 HOUR))
+
+NOW(): 返回当前日期和时间。
+DATE_SUB(NOW(), INTERVAL 1 HOUR): 将当前时间减去 1 小时。
+HOUR(...): 提取上述结果的小时部分。
+作用: 获取当前时间前一小时的小时数。例如，如果当前时间是 16:30，该函数将返回 15。
+
+2. hour(date_sub(current_timestamp,interval 1 hour))
+
+current_timestamp: 等同于 NOW(), 返回当前日期和时间。
+date_sub(current_timestamp, interval 1 hour): 将当前时间减去 1 小时。
+hour(...): 提取上述结果的小时部分。
+作用: 与第一个函数相同，也是获取当前时间前一小时的小时数。
+
+3. date_format(date_add('day',-1,current_date),'%Y-%m-%d')
+
+current_date: 返回当前日期。
+date_add('day', -1, current_date): 将当前日期减去 1 天。
+date_format(..., '%Y-%m-%d'): 将日期格式化为 "YYYY-MM-DD" 的字符串格式。
+作用: 获取昨天日期，并格式化为 "YYYY-MM-DD" 的字符串。
+
+4. date_format(date_sub(current_date,interval 1 day),'%Y-%m-%d')
+
+current_date: 返回当前日期。
+date_sub(current_date, interval 1 day): 将当前日期减去 1 天。
+date_format(..., '%Y-%m-%d'): 将日期格式化为 "YYYY-MM-DD" 的字符串格式。
+作用: 与第三个函数相同，也是获取昨天日期，并格式化为 "YYYY-MM-DD" 的字符串。
+
+```
 
 ### binlog 命令
 ```
