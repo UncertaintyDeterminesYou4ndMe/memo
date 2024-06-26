@@ -1,0 +1,7 @@
+## sparksql & starrocks
+```
+select date_format(CURRENT_DATE, 'yyyy-MM-dd');
+--返回:
+date_format(current_date(), 'yyyy-MM-dd')
+2024-06-26
+```
