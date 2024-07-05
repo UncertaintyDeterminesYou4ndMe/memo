@@ -116,12 +116,15 @@ curl 127.0.0.1:8040/metrics | grep "^starrocks_be_.*_mem_bytes"
 存算分离本地盘pk索引（persistent目录下）的淘汰策略：
 当磁盘占用超过水位线：be配置 starlet_cache_evict_low_water时，会开始执行索引evict，evict的条件是index在一段时间（be.conf lake_local_pk_index_unused_threshold_seconds）内没有被使用过，也就是这个tablet在这段时间内没有导入过，那这个索引就可以被删除掉。
 #### cache
+存算分离内表的cache和湖用的cache都叫datacache，但是配置是单独的，分别可以在对应的文档里找到。starlet相关是存算分离用的。湖相关的在文档查询数据湖-datacache那个章节里有。后面会对这两种datacache做统一。
+
 ##### datacache
 外表缓存
-
+datacache[外表使用] 和 blockcache 是一个东西
 ##### starlet_cache
 内表缓存
-
+starlet_cache[应该就是 block cache 的配置名称]
+存算分离 block cache[这个跟前面的 blockcache 是一个]、Query Cache[Pipeline 支持]
 
 ##### debug
 be配置 sys_log_verbose_modules 设置成 * 
