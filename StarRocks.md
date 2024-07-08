@@ -109,6 +109,11 @@ catalog Hive 源码
 当前是分区级别全量刷新，目前看调度频繁对刷新压力很大的 。所以后续可以做成级联刷新(构造Task DAG)或者增量来解决比较好。
 
 ### 运维
+#### 查看 tablet 个数
+```
+show proc '/statistics';
+```
+
 ```
 curl 127.0.0.1:8040/metrics | grep "^starrocks_be_.*_mem_bytes"
 ```
