@@ -89,7 +89,6 @@ public class ElasticsearchProperties {
 ```
 
 ```java
-package com.shulidata.marketing.common.integration.elasticsearch.config;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -137,15 +136,9 @@ public class ElasticsearchConfig {
 
 
 ```java
-package com.shulidata.marketing.common.integration.elasticsearch.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.shulidata.common.base.exception.CommonException;
-import com.shulidata.common.utils.LoggerUtil;
-import com.shulidata.marketing.common.model.base.ErrorCode;
-import com.shulidata.marketing.common.model.elasticsearch.base.ESBaseData;
-import com.shulidata.marketing.common.model.elasticsearch.base.ESPage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.DocWriteResponse;
@@ -185,8 +178,6 @@ import java.util.Objects;
 
 /**
  * es工具类
- *
- * @author kaifang.z on 2023/4/10
  */
 @Component
 @Slf4j
