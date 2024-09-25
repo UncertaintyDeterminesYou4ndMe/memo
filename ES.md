@@ -48,7 +48,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * es配置属性
  *
- * @author kaifang.z on 2023/4/10
  */
 @Data
 @ConfigurationProperties(prefix = "elasticsearch.config")
@@ -105,7 +104,6 @@ import org.springframework.context.annotation.Configuration;
 /**
  * es配置定义
  *
- * @author kaifang.z on 2023/4/10
  */
 @Configuration
 @EnableConfigurationProperties(ElasticsearchProperties.class)
