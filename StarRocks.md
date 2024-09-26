@@ -1,12 +1,12 @@
-### 原理
+## 原理
 
-#### 湖仓 catalog
+### 湖仓 catalog
 1. 在StarRocks数据库系统中，如何在堆外（off-heap）内存中存储表数据，并且如何通过Starrocks后端（BE）的C++代码来解析这些数据。
 在计算机科学中，堆外内存指的是直接通过操作系统的内存分配函数（如malloc或mmap）分配的内存，而不是通过编程语言的内存分配机制（如Java的堆内存）。使用堆外内存可以更好地控制内存使用，避免垃圾收集器的干扰，从而提高性能。
 
 在StarRocks的堆外表内存布局中，数据按列存储，且每一列的数据在内存中是连续的。不同的数据列存储在堆外内存的不同位置。此外，为了处理数据中的空值，引入了空值指示列（null indicator columns）。还有一个元数据列（meta column），用于保存不同数据列的内存地址、空值指示列的内存地址和行数。
 
-##### 具体的内存布局如下：
+#### 具体的内存布局如下：
 
 元数据列布局：元数据列的起始地址包含了行数，每个固定长度列的空值指示列和数据列的起始地址，以及每个可变长度列的空值指示列、偏移列和数据列的起始地址。
 
@@ -17,7 +17,7 @@
 对于可变长度列（如STRING、DECIMAL），使用二级索引寻址方法。首先通过元数据列获取数据列的起始地址，然后使用偏移列在特定行索引处获取字段的起始内存地址，通过当前行和下一行的偏移计算字段长度，最后使用字段的起始地址和长度读取可变长度的数据。
 这种内存布局优化了数据访问的效率，尤其是在处理大型数据集时，可以减少内存的分配和复制，提高查询和数据处理的性能。此外，由于数据是按列存储的，因此可以更有效地进行列级别的压缩和编码，从而降低存储成本并提高I/O效率。
 
-##### 示意图
+#### 示意图
 示例数据表
 假设我们有一个简单的数据表，包含三列：ID（固定长度整数），Name（可变长度字符串），和Age（固定长度整数），表中有4行数据：
 |ID	|Name	|Age
@@ -104,12 +104,12 @@ catalog Hive 源码
 
 ```
 
-### 导入导出 connector
-#### 概览
+## 导入导出 connector
+### 概览
 ![image](https://github.com/user-attachments/assets/4073aca5-4725-436b-90e8-9c7308207376)
 
-#### 导入参数控制
-##### FE
+### 导入参数控制
+#### FE
 | 参数	| 描述 |
 |---|---|
 max_load_timeout_second<br>min_load_timeout_second | 导入超时时间的最大、最小取值范围，均以秒为单位。默认的最大超时时间为3天，最小超时时间为1秒。您自定义的导入超时时间不可超过该范围。该参数通用于所有类型的导入任务。
@@ -118,7 +118,7 @@ max_running_txn_num_per_db |每个数据库中正在运行的导入任务的最�
 label_keep_max_second	| 导入任务记录的保留时间。已经完成的（FINISHED或CANCELLED）导入任务记录会在StarRocks系统中保留一段时间，时间长短则由此参数决定。参数默认值为3天。该参数通用于所有类型的导入任务。
 
 
-##### BE
+#### BE
 
 | 参数| 描述|
 |---|---|
@@ -127,6 +127,172 @@ write_buffer_size|	导入数据在BE上会先写入到一个内存块，当该�
 tablet_writer_rpc_timeout_sec	|导入过程中，发送一个Batch（1024行）的RPC超时时间。默认为600秒。<br>因为该RPC可能涉及多个分片内存块的写盘操作，所以可能会因为写盘导致RPC超时，可以适当调整超时时间来减少超时错误（例如send batch fail）。同时，如果调大参数write_buffer_size，则tablet_writer_rpc_timeout_sec参数也需要适当调大。
 streaming_load_rpc_max_alive_time_sec|	在导入过程中，StarRocks会为每个Tablet开启一个Writer，用于接收数据并写入。该参数指定了Writer的等待超时时间。默认为600秒。<br>如果在参数指定时间内Writer没有收到任何数据，则Writer会被自动销毁。当系统处理速度较慢时，Writer可能长时间接收不到下一批数据，导致导入报错TabletWriter add batch with unknown id。此时可适当调大该参数。
 load_process_max_memory_limit_percent	|分别为最大内存和最大内存百分比，限制了单个BE上可用于导入任务的内存上限。系统会在两个参数中取较小者，作为最终的BE导入任务内存使用上限。<br>  1. load_process_max_memory_limit_percent：表示对BE总内存限制的百分比。默认为80。总内存限制mem_limit默认为80%，表示对物理内存的百分比。即假设物理内存为M，则默认导入内存限制为M * 80% * 80%。<br> 2. load_process_max_memory_limit_bytes：默认为100 GB。
+
+### stream load
+#### java demo
+```java
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpHeaders;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultRedirectStrategy;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+/**
+ * This class is a java demo for starrocks stream load
+ *
+ * The pom.xml dependency:
+ *
+ *         <dependency>
+ *             <groupId>org.apache.httpcomponents</groupId>
+ *             <artifactId>httpclient</artifactId>
+ *             <version>4.5.3</version>
+ *         </dependency>
+ *
+ * How to use:
+ *
+ * 1 create a table in starrocks with any mysql client
+ *
+ * CREATE TABLE `stream_test` (
+ *   `id` bigint(20) COMMENT "",
+ *   `id2` bigint(20) COMMENT "",
+ *   `username` varchar(32) COMMENT ""
+ * ) ENGINE=OLAP
+ * DUPLICATE KEY(`id`)
+ * DISTRIBUTED BY HASH(`id`) BUCKETS 20;
+ *
+ *
+ * 2 change the StarRocks cluster, db, user config in this class
+ *
+ * 3 run this class, you should see the following output:
+ *
+ * {
+ *     "TxnId": 27,
+ *     "Label": "39c25a5c-7000-496e-a98e-348a264c81de",
+ *     "Status": "Success",
+ *     "Message": "OK",
+ *     "NumberTotalRows": 10,
+ *     "NumberLoadedRows": 10,
+ *     "NumberFilteredRows": 0,
+ *     "NumberUnselectedRows": 0,
+ *     "LoadBytes": 50,
+ *     "LoadTimeMs": 151
+ * }
+ *
+ * Attention:
+ *
+ * 1 wrong dependency version(such as 4.4) of httpclient may cause shaded.org.apache.http.ProtocolException
+ *   Caused by: shaded.org.apache.http.ProtocolException: Content-Length header already present
+ *     at shaded.org.apache.http.protocol.RequestContent.process(RequestContent.java:96)
+ *     at shaded.org.apache.http.protocol.ImmutableHttpProcessor.process(ImmutableHttpProcessor.java:132)
+ *     at shaded.org.apache.http.impl.execchain.ProtocolExec.execute(ProtocolExec.java:182)
+ *     at shaded.org.apache.http.impl.execchain.RetryExec.execute(RetryExec.java:88)
+ *     at shaded.org.apache.http.impl.execchain.RedirectExec.execute(RedirectExec.java:110)
+ *     at shaded.org.apache.http.impl.client.InternalHttpClient.doExecute(InternalHttpClient.java:184)
+ *
+ *2 run this class more than once, the status code for http response is still ok, and you will see
+ *  the following output:
+ *
+ * {
+ *     "TxnId": -1,
+ *     "Label": "39c25a5c-7000-496e-a98e-348a264c81de",
+ *     "Status": "Label Already Exists",
+ *     "ExistingJobStatus": "FINISHED",
+ *     "Message": "Label [39c25a5c-7000-496e-a98e-348a264c81de"] has already been used.",
+ *     "NumberTotalRows": 0,
+ *     "NumberLoadedRows": 0,
+ *     "NumberFilteredRows": 0,
+ *     "NumberUnselectedRows": 0,
+ *     "LoadBytes": 0,
+ *     "LoadTimeMs": 0
+ * }
+ * 3 when the response statusCode is 200, that doesn't mean your stream load is ok, there may be still
+ *   some stream problem unless you see the output with 'ok' message
+ */
+public class StarRocksStreamLoad {
+    private final static String STARROCKS_HOST = "xxx.com";
+    private final static String STARROCKS_DB = "test";
+    private final static String STARROCKS_TABLE = "stream_test";
+    private final static String STARROCKS_USER = "root";
+    private final static String STARROCKS_PASSWORD = "xxx";
+    private final static int STARROCKS_HTTP_PORT = 8030;
+
+    private void sendData(String content) throws Exception {
+        final String loadUrl = String.format("http://%s:%s/api/%s/%s/_stream_load",
+                STARROCKS_HOST,
+                STARROCKS_HTTP_PORT,
+                STARROCKS_DB,
+                STARROCKS_TABLE);
+
+        final HttpClientBuilder httpClientBuilder = HttpClients
+                .custom()
+                .setRedirectStrategy(new DefaultRedirectStrategy() {
+                    @Override
+                    protected boolean isRedirectable(String method) {
+                        return true;
+                    }
+                });
+
+        try (CloseableHttpClient client = httpClientBuilder.build()) {
+            HttpPut put = new HttpPut(loadUrl);
+            StringEntity entity = new StringEntity(content, "UTF-8");
+            put.setHeader(HttpHeaders.EXPECT, "100-continue");
+            put.setHeader(HttpHeaders.AUTHORIZATION, basicAuthHeader(STARROCKS_USER, STARROCKS_PASSWORD));
+            // the label header is optional, not necessary
+            // use label header can ensure at most once semantics
+            put.setHeader("label", "39c25a5c-7000-496e-a98e-348a264c81de");
+            put.setEntity(entity);
+
+            try (CloseableHttpResponse response = client.execute(put)) {
+                String loadResult = "";
+                if (response.getEntity() != null) {
+                    loadResult = EntityUtils.toString(response.getEntity());
+                }
+                final int statusCode = response.getStatusLine().getStatusCode();
+                // statusCode 200 just indicates that starrocks be service is ok, not stream load
+                // you should see the output content to find whether stream load is success
+                if (statusCode != 200) {
+                    throw new IOException(
+                            String.format("Stream load failed, statusCode=%s load result=%s", statusCode, loadResult));
+                }
+
+                System.out.println(loadResult);
+            }
+        }
+    }
+
+    private String basicAuthHeader(String username, String password) {
+        final String tobeEncode = username + ":" + password;
+        byte[] encoded = Base64.encodeBase64(tobeEncode.getBytes(StandardCharsets.UTF_8));
+        return "Basic " + new String(encoded);
+    }
+
+    public static void main(String[] args) throws Exception {
+        int id1 = 1;
+        int id2 = 10;
+        String id3 = "Simon";
+        int rowNumber = 10;
+        String oneRow = id1 + "\t" + id2 + "\t" + id3 + "\n";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < rowNumber; i++) {
+            stringBuilder.append(oneRow);
+        }
+        
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+
+        String loadData = stringBuilder.toString();
+        StarRocksStreamLoad starrocksStreamLoad = new StarRocksStreamLoad();
+        starrocksStreamLoad.sendData(loadData);
+    }
+}
+```
 
 ### 物化视图
 刷新核心逻辑：mv会维护一个visiblemap，记录刷新过哪些分区；每次调度（周期/手动/自动）时候，检查哪些分区变更了，就会触发mv的刷新。
