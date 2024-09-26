@@ -129,6 +129,11 @@ streaming_load_rpc_max_alive_time_sec|	在导入过程中，StarRocks会为每�
 load_process_max_memory_limit_percent	|分别为最大内存和最大内存百分比，限制了单个BE上可用于导入任务的内存上限。系统会在两个参数中取较小者，作为最终的BE导入任务内存使用上限。<br>  1. load_process_max_memory_limit_percent：表示对BE总内存限制的百分比。默认为80。总内存限制mem_limit默认为80%，表示对物理内存的百分比。即假设物理内存为M，则默认导入内存限制为M * 80% * 80%。<br> 2. load_process_max_memory_limit_bytes：默认为100 GB。
 
 ### stream load
+代码集成示例
+Java开发Stream Load，详情请参见 [stream_load](https://github.com/StarRocks/demo/tree/master/MiscDemo/stream_load)。
+
+Spark集成Stream Load，详情请参见 [flink/spark](https://github.com/StarRocks/demo/blob/master/docs/05_flinkConnector_Bean2StarRocks.md)。
+
 #### java demo
 ```java
 import org.apache.commons.codec.binary.Base64;
