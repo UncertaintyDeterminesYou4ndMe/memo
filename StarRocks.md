@@ -108,6 +108,25 @@ catalog Hive 源码
 #### 概览
 ![image](https://github.com/user-attachments/assets/4073aca5-4725-436b-90e8-9c7308207376)
 
+#### 导入参数控制
+##### FE
+| 参数	| 描述 |
+|---|---|
+max_load_timeout_second<br>min_load_timeout_second | 导入超时时间的最大、最小取值范围，均以秒为单位。默认的最大超时时间为3天，最小超时时间为1秒。您自定义的导入超时时间不可超过该范围。该参数通用于所有类型的导入任务。
+desired_max_waiting_jobs | 等待队列可以容纳的最多导入任务数目，默认值为100。<br>例如，FE中处于PENDING状态（即等待执行）的导入任务数目达到该值，则新的导入请求会被拒绝。此配置仅对异步执行的导入有效，如果处于等待状态的异步导入任务数达到限额，则后续创建导入的请求会被拒绝。
+max_running_txn_num_per_db |每个数据库中正在运行的导入任务的最大个数（不区分导入类型、统一计数），默认值为100。<br>当数据库中正在运行的导入任务超过最大值时，后续的导入任务不会被执行。如果是同步作业，则作业会被拒绝；如果是异步作业，则作业会在队列中等待。
+label_keep_max_second	| 导入任务记录的保留时间。已经完成的（FINISHED或CANCELLED）导入任务记录会在StarRocks系统中保留一段时间，时间长短则由此参数决定。参数默认值为3天。该参数通用于所有类型的导入任务。
+
+
+##### BE
+
+| 参数| 描述|
+|---|---|
+push_write_mbytes_per_sec |	BE上单个Tablet的写入速度限制。默认值是10，即10MB/s。<br>根据Schema以及系统的不同，通常BE对单个Tablet的最大写入速度大约在10~30MB/s之间。您可以适当调整该参数来控制导入速度。
+write_buffer_size|	导入数据在BE上会先写入到一个内存块，当该内存块达到阈值后才会写回磁盘。默认值为100 MB。<br>过小的阈值可能导致BE上存在大量的小文件。您可以适当提高该阈值减少文件数量。但过大的阈值可能导致RPC超时，详细请参见参数tablet_writer_rpc_timeout_sec。
+tablet_writer_rpc_timeout_sec	|导入过程中，发送一个Batch（1024行）的RPC超时时间。默认为600秒。<br>因为该RPC可能涉及多个分片内存块的写盘操作，所以可能会因为写盘导致RPC超时，可以适当调整超时时间来减少超时错误（例如send batch fail）。同时，如果调大参数write_buffer_size，则tablet_writer_rpc_timeout_sec参数也需要适当调大。
+streaming_load_rpc_max_alive_time_sec|	在导入过程中，StarRocks会为每个Tablet开启一个Writer，用于接收数据并写入。该参数指定了Writer的等待超时时间。默认为600秒。<br>如果在参数指定时间内Writer没有收到任何数据，则Writer会被自动销毁。当系统处理速度较慢时，Writer可能长时间接收不到下一批数据，导致导入报错TabletWriter add batch with unknown id。此时可适当调大该参数。
+load_process_max_memory_limit_percent	|分别为最大内存和最大内存百分比，限制了单个BE上可用于导入任务的内存上限。系统会在两个参数中取较小者，作为最终的BE导入任务内存使用上限。<br>  1. load_process_max_memory_limit_percent：表示对BE总内存限制的百分比。默认为80。总内存限制mem_limit默认为80%，表示对物理内存的百分比。即假设物理内存为M，则默认导入内存限制为M * 80% * 80%。<br> 2. load_process_max_memory_limit_bytes：默认为100 GB。
 
 ### 物化视图
 刷新核心逻辑：mv会维护一个visiblemap，记录刷新过哪些分区；每次调度（周期/手动/自动）时候，检查哪些分区变更了，就会触发mv的刷新。
