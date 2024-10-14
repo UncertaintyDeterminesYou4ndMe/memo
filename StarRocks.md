@@ -312,6 +312,43 @@ show proc '/statistics';
 ```
 curl 127.0.0.1:8040/metrics | grep "^starrocks_be_.*_mem_bytes"
 ```
+
+#### kill 查询进程
+```sql
+kill connection/query [process_id]
+```
+#### 查看变量
+```sql
+SHOW VARIABLES LIKE '%imeou%';
+```
+结果
+```bash
++------------------------------------+-------+
+| Variable_name                      | Value |
++------------------------------------+-------+
+| interactive_timeout                | 3600  |
+| net_read_timeout                   | 60    |
+| net_write_timeout                  | 60    |
+| new_planner_optimize_timeout       | 3000  |
+| query_delivery_timeout             | 300   |
+| query_queue_pending_timeout_second | 300   |
+| query_timeout                      | 3000  |
+| tx_visible_wait_timeout            | 10    |
+| wait_timeout                       | 28800 |
++------------------------------------+-------+
+```
+##### 举例
+```sql
+select tracking_log from information_schema.load_tracking_logs where job_id=143444;
+SHOW PROC '/current_queries';
+SHOW PROC '/';
+
+select * from information_schema.partitions_meta order by Max_CS;
+
+SET GLOBAL new_planner_optimize_timeout =  60000;
+set global orc_use_column_names=true;
+```
+
 #### 配置项解读
 存算分离本地盘pk索引（persistent目录下）的淘汰策略：
 当磁盘占用超过水位线：be配置 starlet_cache_evict_low_water时，会开始执行索引evict，evict的条件是index在一段时间（be.conf lake_local_pk_index_unused_threshold_seconds）内没有被使用过，也就是这个tablet在这段时间内没有导入过，那这个索引就可以被删除掉。
