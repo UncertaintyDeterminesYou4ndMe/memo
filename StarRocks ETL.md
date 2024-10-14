@@ -64,7 +64,7 @@ SHOW PARTITIONS FROM data_output.ads_lzb_activity_reward_distribution_report
 
 
 
-
+-----------------------------------------------------------------------------------------------
 
 
 
