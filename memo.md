@@ -4795,7 +4795,329 @@ hdfs dfs -mv text.txt text2.txt
 
 ## 三十、kubernetes
 
-```
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    k8s.aliyun.com/pod-ips: 192.168.22.241
+    prometheus.io/path: /metrics
+    prometheus.io/port: '10254'
+    prometheus.io/scrape: 'true'
+  creationTimestamp: '2024-04-01T02:54:10Z'
+  generateName: sparkoperator-779b5c8bc8-
+  labels:
+    app.kubernetes.io/instance: sparkoperator
+    app.kubernetes.io/name: sparkoperator
+    pod-template-hash: 779b5c8bc8
+    product: emr
+  managedFields:
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:prometheus.io/path': {}
+            'f:prometheus.io/port': {}
+            'f:prometheus.io/scrape': {}
+          'f:generateName': {}
+          'f:labels':
+            .: {}
+            'f:app.kubernetes.io/instance': {}
+            'f:app.kubernetes.io/name': {}
+            'f:pod-template-hash': {}
+            'f:product': {}
+          'f:ownerReferences':
+            .: {}
+            'k:{"uid":"fbcd4e0d-ddca-44d7-b721-24e5c8da7f6c"}': {}
+        'f:spec':
+          'f:containers':
+            'k:{"name":"sparkoperator"}':
+              .: {}
+              'f:args': {}
+              'f:env':
+                .: {}
+                'k:{"name":"APPLICATION_TTL"}':
+                  .: {}
+                  'f:name': {}
+                  'f:value': {}
+                'k:{"name":"AUTH_SIGNIN"}':
+                  .: {}
+                  'f:name': {}
+                  'f:value': {}
+                'k:{"name":"AUTH_URL"}':
+                  .: {}
+                  'f:name': {}
+                  'f:value': {}
+                'k:{"name":"SPARK_CONF_DIR"}':
+                  .: {}
+                  'f:name': {}
+                  'f:value': {}
+              'f:image': {}
+              'f:imagePullPolicy': {}
+              'f:name': {}
+              'f:ports':
+                .: {}
+                'k:{"containerPort":10254,"protocol":"TCP"}':
+                  .: {}
+                  'f:containerPort': {}
+                  'f:name': {}
+                  'f:protocol': {}
+              'f:resources': {}
+              'f:securityContext': {}
+              'f:terminationMessagePath': {}
+              'f:terminationMessagePolicy': {}
+              'f:volumeMounts':
+                .: {}
+                'k:{"mountPath":"/etc/spark/conf"}':
+                  .: {}
+                  'f:mountPath': {}
+                  'f:name': {}
+                'k:{"mountPath":"/etc/webhook-certs"}':
+                  .: {}
+                  'f:mountPath': {}
+                  'f:name': {}
+          'f:dnsPolicy': {}
+          'f:enableServiceLinks': {}
+          'f:imagePullSecrets':
+            .: {}
+            'k:{"name":"emr-image-regsecret"}': {}
+          'f:nodeSelector': {}
+          'f:restartPolicy': {}
+          'f:schedulerName': {}
+          'f:securityContext': {}
+          'f:serviceAccount': {}
+          'f:serviceAccountName': {}
+          'f:terminationGracePeriodSeconds': {}
+          'f:tolerations': {}
+          'f:volumes':
+            .: {}
+            'k:{"name":"spark-defaults-configmap-volume"}':
+              .: {}
+              'f:configMap':
+                .: {}
+                'f:defaultMode': {}
+                'f:name': {}
+              'f:name': {}
+            'k:{"name":"webhook-certs"}':
+              .: {}
+              'f:name': {}
+              'f:secret':
+                .: {}
+                'f:defaultMode': {}
+                'f:secretName': {}
+      manager: kube-controller-manager
+      operation: Update
+      time: '2024-04-01T02:54:10Z'
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            'f:k8s.aliyun.com/pod-ips': {}
+      manager: terwayd
+      operation: Update
+      time: '2024-04-01T02:54:10Z'
+    - apiVersion: v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          'f:conditions':
+            'k:{"type":"ContainersReady"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"Initialized"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+            'k:{"type":"Ready"}':
+              .: {}
+              'f:lastProbeTime': {}
+              'f:lastTransitionTime': {}
+              'f:status': {}
+              'f:type': {}
+          'f:containerStatuses': {}
+          'f:hostIP': {}
+          'f:phase': {}
+          'f:podIP': {}
+          'f:podIPs':
+            .: {}
+            'k:{"ip":"192.168.22.241"}':
+              .: {}
+              'f:ip': {}
+          'f:startTime': {}
+      manager: kubelet
+      operation: Update
+      subresource: status
+      time: '2024-04-01T02:54:11Z'
+  name: sparkoperator-779b5c8bc8-gmscv
+  namespace: c-8b5bbb7fe2428456
+  ownerReferences:
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicaSet
+      name: sparkoperator-779b5c8bc8
+      uid: fbcd4e0d-ddca-44d7-b721-24e5c8da7f6c
+  resourceVersion: '42303757'
+  uid: cfcab305-9be9-4913-a27f-db7d4a4ae780
+spec:
+  containers:
+    - args:
+        - '-v=2'
+        - '-logtostderr'
+        - '-namespace=c-8b5bbb7fe2428456'
+        - '-enable-ui-service=true'
+        - >-
+          -ingress-url-format={{$appName}}.c-8b5bbb7fe2428456.ca13fca2ac9544da9ac1fff4a9f2b2617.cn-hangzhou.alicontainer.com
+        - '-controller-threads=10'
+        - '-resync-interval=30'
+        - '-enable-batch-scheduler=false'
+        - '-label-selector-filter='
+        - '-enable-metrics=true'
+        - '-metrics-labels=app_type'
+        - '-metrics-port=10254'
+        - '-metrics-endpoint=/metrics'
+        - '-metrics-prefix='
+        - '-enable-webhook=true'
+        - '-webhook-svc-namespace=c-8b5bbb7fe2428456'
+        - '-webhook-port=8080'
+        - '-webhook-svc-name=sparkoperator-webhook'
+        - '-webhook-config-name=sparkoperator-webhook-config-c-8b5bbb7fe2428456'
+        - '-webhook-namespace-selector='
+        - '-enable-resource-quota-enforcement=false'
+        - '-aliyun-owner=1554710753828130'
+        - '-aliyun-region=cn-hangzhou'
+        - '-use-spark-app-name-as-ingress-name=true'
+      env:
+        - name: APPLICATION_TTL
+          value: '259200'
+        - name: AUTH_URL
+          value: >-
+            http://oauth2proxy.c-8b5bbb7fe2428456.svc.cluster.local:4180/oauth2/auth
+        - name: AUTH_SIGNIN
+          value: >-
+            http://c-8b5bbb7fe2428456.ca13fca2ac9544da9ac1fff4a9f2b2617.cn-hangzhou.alicontainer.com/oauth2/start
+        - name: SPARK_CONF_DIR
+          value: /etc/spark/conf
+      image: >-
+        registry-vpc.cn-hangzhou.aliyuncs.com/emr/spark-operator:v1beta2-1.3.3-3.1.1-deca11f
+      imagePullPolicy: Always
+      name: sparkoperator
+      ports:
+        - containerPort: 10254
+          name: metrics
+          protocol: TCP
+      resources: {}
+      securityContext: {}
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+        - mountPath: /etc/webhook-certs
+          name: webhook-certs
+        - mountPath: /etc/spark/conf
+          name: spark-defaults-configmap-volume
+        - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+          name: kube-api-access-z2z2z
+          readOnly: true
+  dnsPolicy: ClusterFirst
+  enableServiceLinks: true
+  imagePullSecrets:
+    - name: emr-image-regsecret
+  nodeName: cn-hangzhou.192.168.30.51
+  nodeSelector:
+    emr-spark: emr-spark
+  preemptionPolicy: PreemptLowerPriority
+  priority: 0
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}
+  serviceAccount: spark-operator
+  serviceAccountName: spark-operator
+  terminationGracePeriodSeconds: 30
+  tolerations:
+    - effect: NoSchedule
+      key: emr-node-taint
+      operator: Equal
+      value: emr
+    - effect: NoExecute
+      key: node.kubernetes.io/not-ready
+      operator: Exists
+      tolerationSeconds: 300
+    - effect: NoExecute
+      key: node.kubernetes.io/unreachable
+      operator: Exists
+      tolerationSeconds: 300
+  volumes:
+    - name: webhook-certs
+      secret:
+        defaultMode: 420
+        secretName: sparkoperator-webhook-certs
+    - configMap:
+        defaultMode: 420
+        name: emr-spark-defaults-conf
+      name: spark-defaults-configmap-volume
+    - name: kube-api-access-z2z2z
+      projected:
+        defaultMode: 420
+        sources:
+          - serviceAccountToken:
+              expirationSeconds: 3607
+              path: token
+          - configMap:
+              items:
+                - key: ca.crt
+                  path: ca.crt
+              name: kube-root-ca.crt
+          - downwardAPI:
+              items:
+                - fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.namespace
+                  path: namespace
+status:
+  conditions:
+    - lastTransitionTime: '2024-04-01T02:54:10Z'
+      status: 'True'
+      type: Initialized
+    - lastTransitionTime: '2024-04-01T02:54:11Z'
+      status: 'True'
+      type: Ready
+    - lastTransitionTime: '2024-04-01T02:54:11Z'
+      status: 'True'
+      type: ContainersReady
+    - lastTransitionTime: '2024-04-01T02:54:10Z'
+      status: 'True'
+      type: PodScheduled
+  containerStatuses:
+    - containerID: >-
+        containerd://fac207a17a07ef05a2f08b10f69100dcf1c6078b8fccf405cc2e6d1b52b20ad1
+      image: >-
+        registry-vpc.cn-hangzhou.aliyuncs.com/emr/spark-operator:v1beta2-1.3.3-3.1.1-deca11f
+      imageID: >-
+        registry-vpc.cn-hangzhou.aliyuncs.com/emr/spark-operator@sha256:02d26ebad1dfc7eda822d325c892fdf934a76dfe698be4dca51040bbaebf93dd
+      lastState: {}
+      name: sparkoperator
+      ready: true
+      restartCount: 0
+      started: true
+      state:
+        running:
+          startedAt: '2024-04-01T02:54:11Z'
+  hostIP: 192.168.30.51
+  phase: Running
+  podIP: 192.168.22.241
+  podIPs:
+    - ip: 192.168.22.241
+  qosClass: BestEffort
+  startTime: '2024-04-01T02:54:10Z'
+
 ```
 
 ## 三十一、mysql
