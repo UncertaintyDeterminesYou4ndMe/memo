@@ -6,7 +6,7 @@
 - `#include "configbase.h"`: 包含基础配置类的头文件。
 
 ## 配置名称及默认值
-
+### be
 - `cluster_id`: 集群ID，默认为"-1"。
 - `be_port`: Backend服务端口，默认为"9060"。
 - `thrift_port`: Thrift服务端口，默认为"0"。
@@ -127,5 +127,9 @@
 - `routine_load_kafka_default_max_offset_lag`: 例行加载Kafka默认最大偏移滞后，默认为"100000"。
 - `max_routine_load_kafka_partition_offset_lag`: 最大例行加载Kafka分区偏移滞后，默认为"100000000"。
 
-以上是StarRocks的部分配置参数及其默认值的说明。这些配置涉及到集群管理、服务端口、线程数、内存管理、日志设置、任务调度、下载速度限制、压缩设置等多个方面。了解这些配置参数有助于更好地管理和优化StarRocks集群的性能。
+### 删除数据及磁盘回收站管理
+- `catalog_trash_expire_second`:删除表/数据库之后，元数据在回收站中保留的时长，超过这个时长，数据就不可以通过RECOVER 语句恢复。默认为 86400s。
+- `path_scan_interval_second`: GC 线程清理过期数据的间隔时间.默认为 86400s。
+- `trash_file_expire_time_sec`: 回收站清理的间隔。自 v2.5.17、v3.0.9 以及 v3.1.6 起，默认值由 259200 变为 86400s。
+- `max_garbage_sweep_interval`: 磁盘进行垃圾清理的最大间隔。自 3.0 版本起，该参数由静态变为动态。3600s。
 
