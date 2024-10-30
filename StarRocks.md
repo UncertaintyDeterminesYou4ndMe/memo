@@ -1,5 +1,76 @@
 ## 原理
 
+### jdbc catalog join paimon catalog
+```
+PLAN FRAGMENT 0
+ OUTPUT EXPRS:5: user_id
+  PARTITION: UNPARTITIONED
+
+  RESULT SINK
+
+  12:Project
+  |  <slot 5> : 5: user_id
+  |  
+  11:HASH JOIN
+  |  join op: NULL AWARE LEFT ANTI JOIN (BROADCAST)
+  |  colocate: false, reason: 
+  |  equal join conjunct: 41: cast = 42: cast
+  |  
+  |----10:EXCHANGE
+  |    
+  3:Project
+  |  <slot 5> : 5: user_id
+  |  <slot 41> : CAST(5: user_id AS DOUBLE)
+  |  
+  2:AGGREGATE (update finalize)
+  |  group by: 5: user_id
+  |  
+  1:Project
+  |  <slot 5> : user_id
+  |  
+  0:SCAN JDBC
+     TABLE: `channel_position_trans_record`
+     QUERY: SELECT `task_id`, `user_id`, `applet_id`, `init_scene_name`, `finish_date` FROM `channel_position_trans_record` WHERE (`applet_id` = 800000000000) AND (`init_scene_name` = 'shequn_yunma') AND (`task_id` = '789') AND (`finish_date` = '2024-10-29')
+
+PLAN FRAGMENT 1
+ OUTPUT EXPRS:
+  PARTITION: HASH_PARTITIONED: 39: get_json_object
+
+  STREAM DATA SINK
+    EXCHANGE ID: 10
+    UNPARTITIONED
+
+  9:Project
+  |  <slot 42> : CAST(39: get_json_object AS DOUBLE)
+  |  
+  8:AGGREGATE (merge finalize)
+  |  group by: 39: get_json_object
+  |  
+  7:EXCHANGE
+
+PLAN FRAGMENT 2
+ OUTPUT EXPRS:
+  PARTITION: RANDOM
+
+  STREAM DATA SINK
+    EXCHANGE ID: 07
+    HASH_PARTITIONED: 39: get_json_object
+
+  6:AGGREGATE (update serialize)
+  |  STREAMING
+  |  group by: 39: get_json_object
+  |  
+  5:Project
+  |  <slot 39> : get_json_object(25: extparams, '$.uid')
+  |  
+  4:PaimonScanNode
+     TABLE: paimon_track_event_dt
+     NON-PARTITION PREDICATES: 37: dt = '2024-10-29', 34: pagealias = '聚合页', 23: eventid = 'taskFinish', get_json_object(25: extparams, '$.task_name') = 'shequn_yunma_789', get_json_object(25: extparams, '$.task_desc') = '逛15秒直播'
+     MIN/MAX PREDICATES: 37: dt <= '2024-10-29', 37: dt >= '2024-10-29', 34: pagealias <= '聚合页', 34: pagealias >= '聚合页', 23: eventid <= 'taskFinish', 23: eventid >= 'taskFinish'
+     cardinality=-1
+     avgRowSize=0.0
+```
+
 ### 湖仓 catalog
 1. 在StarRocks数据库系统中，如何在堆外（off-heap）内存中存储表数据，并且如何通过Starrocks后端（BE）的C++代码来解析这些数据。
 在计算机科学中，堆外内存指的是直接通过操作系统的内存分配函数（如malloc或mmap）分配的内存，而不是通过编程语言的内存分配机制（如Java的堆内存）。使用堆外内存可以更好地控制内存使用，避免垃圾收集器的干扰，从而提高性能。
@@ -378,5 +449,7 @@ FE 的配置项 JAVA_OPTS_FOR_JDK_9
 ```
 关闭自适应 启动填充优化,设置数组 copy 优化数值.
 ```
+
+
 
 JAVA_OPTS_FOR_JDK_11=" -server -XX:+UnlockExperimentalVMOptions -XX:InitiatingHeapOccupancyPercent=90  -Dlog4j2.formatMsgNoLookups=true -Xmx22G -Xms22G -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:StringDeduplicationAgeThreshold=7  -XX:G1HeapRegionSize=16m -XX:G1HeapWastePercent=20 -XX:G1MixedGCLiveThresholdPercent=70  -XX:MetaspaceSize=256m -XX:MaxTenuringThreshold=15  -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -Xlog:gc*:${LOG_DIR}/fe.gc.log.$DATE:time"
