@@ -382,6 +382,7 @@ show proc '/statistics';
 
 ```
 curl 127.0.0.1:8040/metrics | grep "^starrocks_be_.*_mem_bytes"
+curl -XGET -s http://BE_IP:BE_HTTP_PORT/metrics | grep "^starrocks_be_.*_mem_bytes\|^starrocks_be_tcmalloc_bytes_in_use"  看下具体的内存占用情况
 ```
 
 #### kill 查询进程
