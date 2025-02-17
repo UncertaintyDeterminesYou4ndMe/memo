@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `data_output`.`ads_lzb_activity_reward_distribution_r
   `gmt_created` DATETIME NOT NULL COMMENT '日期'
 ) 
 DUPLICATE KEY(id, trans_id)
-COMMENT "来助宝CPA任务报表"
+COMMENT "CPA任务报表"
 PARTITION BY date_trunc('day', gmt_created);
 -- 初始化历史存量数据时使用 insert into ，历史数据会落到分区上。增量加工时使用 insert overwrite partition 写入对应分区增量的数据（overwrite 保证可以重跑幂等性）
 insert into data_output.ads_lzb_activity_reward_distribution_report ( 
@@ -38,7 +38,7 @@ SELECT
         WHEN ucat.biz_type = 'EXCHANGE' THEN '金币兑换'
     END AS 订单类型,
     COALESCE(co.title, '金币兑换钱包') AS 任务名称,
-    '来助宝' AS 业务归属,
+    'XXX' AS 业务归属,
     ucat.cash_num AS 金额,
     ucat.gmt_created AS 时间
 FROM
