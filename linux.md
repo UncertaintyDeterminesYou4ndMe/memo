@@ -769,6 +769,10 @@ $ curl -X POST https://www.example.com
 grep '"project":"SA HSHSAhjjdaviouau"' ua-2-event-sensor.log |grep '"type":"track"' |wc -l >21.ret 2>&1
 ```
 
+```查找压缩文件中的关键字
+zgrep "parallelPutToStoreThreadLimit" /mnt/disk1/log/hbase/http-request.log-2025-02-15.2.log.gz > /path/to/output/file
+```
+
 #### 2. shell 判断字符串包含关系的 case：
 
 ```
