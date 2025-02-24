@@ -4,7 +4,7 @@
 ```bash
 #!/bin/bash
 
-HDFS_BASE="**************/hbase/c-b7d195d258c59078/data"
+HDFS_BASE="**************/hbase/c-b********5***78/data"
 EXCLUDE_DIRS="SYSTEM|default|**********/hbase/c-********78/data/hbase|items"
 
 # 获取有效组目录
