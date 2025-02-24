@@ -1,5 +1,46 @@
 # linux 命令行操作
 
+## 实用脚本
+```bash
+#!/bin/bash
+
+HDFS_BASE="**************/hbase/c-b7d195d258c59078/data"
+EXCLUDE_DIRS="SYSTEM|default|**********/hbase/c-********78/data/hbase|items"
+
+# 获取有效组目录
+groups=$(hdfs dfs -ls $HDFS_BASE | awk '{print $NF}' | grep -vE "$EXCLUDE_DIRS")
+
+for group in $groups; do
+    group_name=$(basename "$group")
+
+    # 获取表目录
+    tables=$(hdfs dfs -ls $group | awk '{print $NF}' | grep -vE "items")
+
+    for table in $tables; do
+        table_name=$(basename "$table")
+        
+        # 遍历每个region目录
+        while IFS= read -r line; do
+            # 使用awk提取最后一列（路径）
+            path=$(echo "$line" | awk '{print $NF}' | grep -vE "items|tmp|tabledesc|corrupt|snapshot|archive")
+            region_dir=$(basename "$path")
+
+            # 只处理32位十六进制的region目录
+            if [[ $region_dir =~ ^[0-9a-f]{32}$ ]]; then
+                # 获取该region目录下所有文件的大小
+                region_size=$(hdfs dfs -du -s "$path" | awk '{print $1}' | grep -vE "items|tmp|tabledesc|corrupt|snapshot|archive")
+                if [ -n "$region_size" ] && [ "$region_size" -gt 0 ]; then
+                    # 转换为易读格式（保留一位小数）
+                    human_size=$(numfmt --to=iec --suffix=B --format="%.1f" "$region_size" 2>/dev/null | sed 's/B$//')
+                    echo -e "${group_name}\t${table_name}\t${region_dir}\t${human_size}"
+                fi
+            fi
+        done < <(hdfs dfs -ls "$table" 2>/dev/null)
+    done
+done
+```
+
+
 ## 三大重要命令
 ### sed
 1. 举例
