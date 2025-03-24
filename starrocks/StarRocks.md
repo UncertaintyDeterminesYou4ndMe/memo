@@ -370,6 +370,151 @@ public class StarRocksStreamLoad {
 }
 ```
 
+```
+package app.label;
+
+import app.label.function.StarRocksProcess;
+import com.alibaba.fastjson.JSONObject;
+import com.starrocks.connector.flink.StarRocksSink;
+import com.starrocks.connector.flink.table.sink.StarRocksSinkOptions;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
+import org.apache.flink.util.Collector;
+
+@Slf4j
+public class LabelSinkLocal {
+    public static void main(String[] args) throws Exception {
+        System.out.println("===> 程序开始启动...");
+        
+        // 创建执行环境
+        final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        System.out.println("===> 已创建执行环境");
+        
+        // 从 Socket 读取数据
+        DataStream<String> dataStream = env.socketTextStream("localhost", 9999, "\n")
+                .flatMap(new FlatMapFunction<String, JSONObject>() {
+                    @Override
+                    public void flatMap(String value, Collector<JSONObject> out) throws Exception {
+                        try {
+                            System.out.println("===> 收到Socket数据: " + value);
+                            JSONObject jsonObject = JSONObject.parseObject(value);
+                            System.out.println("===> 解析为JSON: " + jsonObject);
+                            out.collect(jsonObject);
+                        } catch (Exception e) {
+                            System.out.println("===> 解析JSON失败: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+                })
+                .uid("flatMap").name("flatMap")
+                .keyBy((KeySelector<JSONObject, Long>) json -> {
+                    Long memberId = json.getLong("member_id");
+                    System.out.println("===> 按member_id分组: " + memberId);
+                    return memberId;
+                })
+                .process(new StarRocksProcess())
+                .uid("process").name("process");
+
+        // 强制增加一个打印算子，确保数据被输出到控制台
+        dataStream.print("数据输出");
+
+        StarRocksSinkOptions options = StarRocksSinkOptions.builder()
+                .withProperty("jdbc-url", "jdbc:mysql://127.0.0.1:9030")
+                .withProperty("load-url", "127.0.0.1:8030")
+                .withProperty("database-name", "test")
+                .withProperty("table-name", "ads_user_profile")
+                .withProperty("username", "root")
+                .withProperty("password", "root")
+                .withProperty("sink.semantic", "at-least-once")
+                .withProperty("sink.version", "V2")
+                .withProperty("sink.label-prefix", "test-")
+                .withProperty("sink.properties.format", "json")
+                .withProperty("sink.buffer-flush.interval-ms", "1000")
+                .withProperty("sink.buffer-flush.max-bytes", "67108864")
+                .withProperty("sink.properties.partial_update", "true")
+                .withProperty("sink.properties.partial_update_mode", "row")
+                .withProperty("sink.properties.strip_outer_array", "true")
+                .withProperty("sink.properties.columns", "member_id, user_right_type_s, card_country_s")
+                .build();
+
+        System.out.println("===> StarRocks sink配置完成");
+        log.info("StarRocks sink配置: {}", options);
+
+        // 打印一下输出的数据，便于调试
+        DataStream<String> loggedStream = dataStream.map(data -> {
+            System.out.println("===> 即将写入StarRocks的数据: " + data);
+            log.info("即将写入StarRocks的数据: {}", data);
+            return data;
+        }).name("debug-logging").uid("debug-logging");
+
+//        String[] records = new String[]{
+//                "{\"id\":1, \"name\":\"starrocks-json\", \"score\":100}",
+//                "{\"id\":2, \"name\":\"flink-json\", \"score\":100}",
+//        };
+//        DataStream<String> source = env.fromElements(records);
+
+/**
+ * Configure the Flink connector with the required properties.
+ * You also need to add properties "sink.properties.format" and "sink.properties.strip_outer_array"
+ * to tell the Flink connector the input records are JSON-format and to strip the outermost array structure.
+ */
+
+//        StarRocksSinkOptions options = StarRocksSinkOptions.builder()
+//                .withProperty("jdbc-url", "jdbc:mysql://127.0.0.1:9030")
+//                .withProperty("load-url", "127.0.0.1:8030")
+//                .withProperty("database-name", "test")
+//                .withProperty("table-name", "score_board")
+//                .withProperty("username", "root")
+//                .withProperty("password", "root")
+//                .withProperty("sink.properties.format", "json")
+//                .withProperty("sink.properties.strip_outer_array", "true")
+//                .withProperty("sink.connect.timeout-ms", "10000")
+//                .withProperty("sink.properties.timeout", "600")
+//                .withProperty("sink.max-retries", "3")
+//                .withProperty("sink.properties.strict_mode", "false")
+//                .build();
+// Create the sink with the options.
+//        SinkFunction<String> starRockSink = StarRocksSink.sink(options);
+//        source.addSink(starRockSink);
+
+        loggedStream.addSink(StarRocksSink.sink(options))
+                .uid("sink").name("sink");
+
+        System.out.println("===> Flink作业已配置完成，开始执行...");
+        log.info("Flink作业已配置完成，开始执行...");
+        env.execute("localTest");
+    }
+}
+
+```
+
+```resource/log4j.properties
+# Root logger option
+log4j.rootLogger=INFO, stdout, file
+
+# Direct log messages to stdout
+log4j.appender.stdout=org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.Target=System.out
+log4j.appender.stdout.layout=org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
+
+# Direct log messages to a log file
+log4j.appender.file=org.apache.log4j.RollingFileAppender
+log4j.appender.file.File=./logs/application.log
+log4j.appender.file.MaxFileSize=10MB
+log4j.appender.file.MaxBackupIndex=10
+log4j.appender.file.layout=org.apache.log4j.PatternLayout
+log4j.appender.file.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n
+
+# Set specific logger levels
+log4j.logger.app.label=DEBUG
+log4j.logger.com.starrocks=INFO 
+```
+
 ### 物化视图
 刷新核心逻辑：mv会维护一个visiblemap，记录刷新过哪些分区；每次调度（周期/手动/自动）时候，检查哪些分区变更了，就会触发mv的刷新。
 当前是分区级别全量刷新，目前看调度频繁对刷新压力很大的 。所以后续可以做成级联刷新(构造Task DAG)或者增量来解决比较好。
@@ -378,6 +523,10 @@ public class StarRocksStreamLoad {
 #### 查看 tablet 个数
 ```
 show proc '/statistics';
+```
+
+```
+ADMIN SHOW FRONTEND CONFIG LIKE 'stream_load_force_use_ip';
 ```
 
 ```
