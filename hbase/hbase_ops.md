@@ -12,6 +12,6 @@ unassign
 ## hbase 均衡开关
 若出现 hbase 重启失败，务必手动开启 `hbase balancer_enabled` 开关
 ```
-hbase shell > `balancer_enabled`
-hbase shell > `balance_switch true`
+hbase shell > balancer_enabled
+hbase shell > balance_switch true
 ```
