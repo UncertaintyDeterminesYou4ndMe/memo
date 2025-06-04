@@ -100,7 +100,7 @@ SELECT * FROM qa_pairs LIMIT 1000;
 
 ### 2. 展示更宽的内容（不省略长字符串）
 
-DuckDB shell 默认会截断每列的显示宽度。你可以用 `.mode` 和 `.maxcolwidth` 命令调整：
+DuckDB shell 默认会截断每列的显示宽度。你可以用 `.mode` 和 `.maxcolwidth` 命令调整[有误，与实际不符]：
 
 #### 查看帮助
 
@@ -111,7 +111,7 @@ DuckDB shell 默认会截断每列的显示宽度。你可以用 `.mode` 和 `.m
 #### 设置最大列宽
 
 ```sql
-.maxcolwidth 1000
+.maxcolwidth 1000 [有误，与实际不符]
 ```
 这会把每列最大显示宽度设为1000字符（你可以根据需要调整）。
 
@@ -137,7 +137,7 @@ COPY (SELECT * FROM qa_pairs) TO 'qa_pairs.parquet';
 
 ## 总结
 
-- 用 `.maxcolwidth 1000` 增大每列显示宽度，减少省略。
+- 用 `.maxcolwidth 1000` 增大每列显示宽度，减少省略。[有误，与实际不符]
 - 用 `LIMIT` 控制显示行数。
 - 用 `COPY` 导出完整数据到文件查看。
 
@@ -146,6 +146,6 @@ COPY (SELECT * FROM qa_pairs) TO 'qa_pairs.parquet';
 **示例：**
 
 ```sql
-.maxcolwidth 1000
+.maxcolwidth 1000 [有误，与实际不符]
 SELECT * FROM qa_pairs LIMIT 10;
 ```
