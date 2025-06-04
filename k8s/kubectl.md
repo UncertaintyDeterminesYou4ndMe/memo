@@ -10,7 +10,7 @@ kubectl get pods --all-namespaces      # 查看所有命名空间的 Pod
 kubectl get pods -o wide               # 显示详细信息（IP/节点等）
 kubectl get pods -o yaml/json          # 以 YAML/JSON 格式输出
 kubectl describe pod <pod-name>        # 查看 Pod 详细信息（事件/状态等）
-
+```
 ### 创建/删除资源
 kubectl create -f <file.yaml>          # 通过 YAML 文件创建资源
 kubectl delete pod <pod-name>          # 删除 Pod
