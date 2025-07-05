@@ -3834,6 +3834,14 @@ values ('111'),
 ## 十九、Git
 
 ```
+- 日常最佳实践
+git status
+git pull origin qa_clustering
+git stash push -m "保存本地更改"
+git stash pop
+```
+
+```
 Commit message格式
 <type>: <subject>
 
