@@ -13,7 +13,7 @@ pip install -i https://pypi.org/simple PySimpleGUI
 > source .venv/bin/activate
 # 退出虚拟环境
 > deactivate
-
+```
 
 ### conda 环境
 ```
