@@ -1,14 +1,105 @@
+
+### 运维
+#### 查看 tablet 个数
+```
+show proc '/statistics';
+```
+
+```
+ADMIN SHOW FRONTEND CONFIG LIKE 'stream_load_force_use_ip';
+```
+
+```
+curl 127.0.0.1:8040/metrics | grep "^starrocks_be_.*_mem_bytes"
+curl -XGET -s http://BE_IP:BE_HTTP_PORT/metrics | grep "^starrocks_be_.*_mem_bytes\|^starrocks_be_tcmalloc_bytes_in_use"  看下具体的内存占用情况
+```
+
+#### kill 查询进程
+```sql
+kill connection/query [process_id]
+```
+#### 查看变量
+```sql
+SHOW VARIABLES LIKE '%imeou%';
+```
+结果
+```bash
++------------------------------------+-------+
+| Variable_name                      | Value |
++------------------------------------+-------+
+| interactive_timeout                | 3600  |
+| net_read_timeout                   | 60    |
+| net_write_timeout                  | 60    |
+| new_planner_optimize_timeout       | 3000  |
+| query_delivery_timeout             | 300   |
+| query_queue_pending_timeout_second | 300   |
+| query_timeout                      | 3000  |
+| tx_visible_wait_timeout            | 10    |
+| wait_timeout                       | 28800 |
++------------------------------------+-------+
+```
+##### 举例
+```sql
+select tracking_log from information_schema.load_tracking_logs where job_id=143444;
+SHOW PROC '/current_queries';
+SHOW PROC '/';
+
+select * from information_schema.partitions_meta order by Max_CS;
+
+SET GLOBAL new_planner_optimize_timeout =  60000;
+set global orc_use_column_names=true;
+```
+
+#### 配置项解读
+存算分离本地盘pk索引（persistent目录下）的淘汰策略：
+当磁盘占用超过水位线：be配置 starlet_cache_evict_low_water时，会开始执行索引evict，evict的条件是index在一段时间（be.conf lake_local_pk_index_unused_threshold_seconds）内没有被使用过，也就是这个tablet在这段时间内没有导入过，那这个索引就可以被删除掉。
+#### cache
+存算分离内表的cache和湖用的cache都叫datacache，但是配置是单独的，分别可以在对应的文档里找到。starlet相关是存算分离用的。湖相关的在文档查询数据湖-datacache那个章节里有。后面会对这两种datacache做统一。
+
+##### datacache
+外表缓存
+datacache[外表使用] 和 blockcache 是一个东西
+##### starlet_cache
+内表缓存
+starlet_cache[应该就是 block cache 的配置名称]
+存算分离 block cache[这个跟前面的 blockcache 是一个]、Query Cache[Pipeline 支持]
+
+##### debug
+be配置 sys_log_verbose_modules 设置成 * 
+fe配置 sys_log_level 设置成 debug
+##### jemalloc
+FE 的配置项 JAVA_OPTS_FOR_JDK_9
+改成  
+```
+"-Dlog4j2.formatMsgNoLookups=true -Xmx20g -XX:MaxDirectMemorySize=1g -XX:+UseMembar -XX:+UseStringDeduplication -XX:+UseG1GC -Xlog:gc*:file=${STARROCKS_HOME}/log/fe.gc.log.$DATE:time -XX:+PrintConcurrentLocks"
+#####  **解决 fe fullGC 问题**
+增加 JVM 参数
+```
+-XX:-UseAdaptiveSizePolicy -XX:+OptimizeFill -XX:ArrayCopyLoadStoreMaxElem=64
+```
+关闭自适应 启动填充优化,设置数组 copy 优化数值.
+```
+
+
+
+JAVA_OPTS_FOR_JDK_11=" -server -XX:+UnlockExperimentalVMOptions -XX:InitiatingHeapOccupancyPercent=90  -Dlog4j2.formatMsgNoLookups=true -Xmx22G -Xms22G -XX:MaxGCPauseMillis=200 -XX:+UseStringDeduplication -XX:StringDeduplicationAgeThreshold=7  -XX:G1HeapRegionSize=16m -XX:G1HeapWastePercent=20 -XX:G1MixedGCLiveThresholdPercent=70  -XX:MetaspaceSize=256m -XX:MaxTenuringThreshold=15  -XX:MaxMetaspaceSize=1g -XX:+UseG1GC -Xlog:gc*:${LOG_DIR}/fe.gc.log.$DATE:time"
+
+
 - 查看 FE 列表
-  SHOW FRONTENDS;
-
+```
+SHOW FRONTENDS;
+```
 - 查看 Compute BE 列表
-  SHOW COMPUTE NODES;
-
+```  
+SHOW COMPUTE NODES;
+```
 - 查看 tablet
-  show tablets from bi_cdp__lb.ads_user_profile;
-
+```
+show tablets from bi_cdp__lb.ads_user_profile;
+```
 - 分区
-  show partitions from bi_cdp__lb.ads_user_profile;
-
+```
+show partitions from bi_cdp__lb.ads_user_profile;
+```
 - 展示当前服务器内运行线程执行的操作。当前版本仅支持展示查询任务。
   SHOW FULL PROCESSLIST;
