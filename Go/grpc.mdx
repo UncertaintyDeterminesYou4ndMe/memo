@@ -1,0 +1,23 @@
+方法1: go run (无需编译，最快速)
+# 直接运行，自动编译并执行
+go run .
+
+# 后台运行
+go run . &
+
+方法2: 使用IDE调试器 (最强大)
+如果您使用VSCode或GoLand：
+设置断点
+直接按F5调试
+可以逐步调试gRPC方法
+
+方法3: 解决grpcurl的reflection问题
+有几种方式解决您遇到的reflection错误：
+方式A: 使用proto文件直接调用
+
+```
+grpcurl -plaintext -import-path proto -proto qa.proto localhost:3001 qa.QAService/Health
+
+grpcurl -plaintext -import-path proto -proto qa.proto -d '{"question":"如何开户?"}' localhost:3001 qa.QAService/Ask
+```
+
