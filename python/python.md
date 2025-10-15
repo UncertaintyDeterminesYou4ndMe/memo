@@ -8,11 +8,14 @@ pip install -i https://pypi.org/simple PySimpleGUI
 ```
 ### 设置终端运行环境
 ``` 
-> python
-# 使用开发虚拟环境
-> source .venv/bin/activate
-# 退出虚拟环境
-> deactivate
+# 创建虚拟环境
+python3 -m venv venv
+
+# 激活虚拟环境
+source venv/bin/activate
+
+# 安装依赖
+pip install flask flask-cors
 ```
 
 ### conda 环境
