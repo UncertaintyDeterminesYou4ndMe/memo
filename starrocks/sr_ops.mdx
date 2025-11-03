@@ -14,6 +14,11 @@ curl 127.0.0.1:8040/metrics | grep "^starrocks_be_.*_mem_bytes"
 curl -XGET -s http://BE_IP:BE_HTTP_PORT/metrics | grep "^starrocks_be_.*_mem_bytes\|^starrocks_be_tcmalloc_bytes_in_use"  看下具体的内存占用情况
 ```
 
+#### 查看内表的 compaction score
+```
+select db_name, table_name, partition_id, partition_name, AVG_CS, max_cs  from information_schema.partitions_meta order by max_cs desc limit 20;
+```
+
 #### kill 查询进程
 ```sql
 kill connection/query [process_id]
@@ -103,3 +108,5 @@ show partitions from bi_cdp__lb.ads_user_profile;
 ```
 - 展示当前服务器内运行线程执行的操作。当前版本仅支持展示查询任务。
   SHOW FULL PROCESSLIST;
+
+
