@@ -106,25 +106,3 @@ cp -r ~/code/skills/skills/* ~/.agents/skills/
 
 所有 Agent 自动同步。
 
----
-
-## 技能描述优化要点
-
-在本次同步过程中，顺手用 `skill-creator` 优化了 `code-cleanup` 的 description：
-
-**原则**：Claude 倾向于「不触发」技能，description 要足够「有推动力」：
-
-1. **覆盖多语言触发词**：中文场景下要同时包含中英文关键词
-2. **描述隐式场景**：不只是关键词匹配，要描述"即使用户没说 cleanup，但明显需要"的情形
-3. **`## 何时使用` 不要放在 body 里**：触发条件全部放在 frontmatter 的 description 字段
-
-**改动示例**：
-
-```diff
-- description: 执行迭代期代码清理，识别并删除无用代码、重复逻辑和过期实现，保持小步安全变更。
-+ description: 迭代期代码清理专家，识别并安全删除无用代码、重复逻辑、废弃实现和遗留兼容层，保持小步可验证变更。
-+ Use this skill whenever the user mentions cleanup, dead code, unused imports, remove unused,
-+ refactor, 清理, 删无用代码, 重复逻辑, or wants to tidy up code before a commit or code review.
-+ Also trigger when the user finishes a feature and mentions the codebase has leftover old
-+ implementations, legacy adapters, or deprecated paths — even if they don't explicitly say "cleanup".
-```
