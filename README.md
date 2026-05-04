@@ -1,12 +1,18 @@
-# 仓库概述
+# memo
 
-本仓库主要记录了关于各种技术的相关知识和操作说明，包括但不限于 Kafka、Hbase、ES（Elasticsearch）、Paimon 以及 CDC（Change Data Capture）等，这些文档旨在帮助开发人员和运维人员更好地理解和使用这些技术。
+个人技术备忘录：记录关键判断、设计取舍与核心洞察，而非操作流水账。
 
 ## 目录结构
 
-### `memo` 目录
-- **`memo.md`**：包含了关于 Kafka、Maven、Hbase 等多种技术的详细信息，如 Kafka 的运维操作（Topic 创建、查询 Topic 列表等）、Maven 的 Shade 配置文件、Hbase 与 Hive 的集成等。
-- **`ES.md`**：主要记录了 ES 配置工具类的相关代码和说明，包括文档的新增、更新、查询、删除等操作，以及索引过程的调整和优化。
-- **`paimon` 目录**
-  - **`paimon table.md`**：介绍了 Paimon Append Only 表（非主键表）的相关文档，包括 Paimon Catalog 和 Paimon 表的创建操作等。
-- **`CDC.md`**：介绍了流行的 CDC 工具和技术，如 Debezium、Maxwell CDC、Canal 等，以及它们的特点和用途。
+| 目录 | 内容 |
+|------|------|
+| `claude-code/` | Claude Code 实现分析、调试与扩展（system prompt、skills、statusline、抓包诊断等） |
+| `llm/` | LLM 训练与研究、prompt 工程（`prompts/`）、记忆机制笔记（`memory/`） |
+| `data/` | 数据栈：ClickHouse、Kafka、ES、CDC、Flink、SQL 函数；按引擎细分 `paimon/`、`starrocks/`、`hbase/`、`duckdb/`、`postgres/` |
+| `infra/` | 操作系统与语言基础：`linux.md`、`mac.md`、`java.md`、`python.md`、`go/`、`k8s/` |
+| `tools/` | 工作流工具：git 快捷脚本、clash、dify、印刷色彩处理 |
+| `archive/` | 历史归档：`memo.md` 旧大杂烩、临时财报文件等，新内容不再写入 |
+
+## 写入约定
+
+由 `memo-practice` skill 自动选择目录并写入。新主题若无对应分类，会在根创建新二级目录而非堆在根下。
