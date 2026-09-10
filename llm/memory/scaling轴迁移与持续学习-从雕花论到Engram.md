@@ -85,3 +85,7 @@ DeepSeek《Conditional Memory via Scalable Lookup》(arXiv 2601.07372, 2026-01�
 | CL-Bench (2606.05661) | 评测坐标 |
 | Titans Revisited (2510.09551) | 解毒剂，校准架构路线预期 |
 | Engram (2601.07372) | 记忆/推理分家，V4 前瞻 |
+
+## 后续
+
+- 2026-09-10 复盘：[五周后逐条核对](scaling轴迁移与持续学习-从雕花论到Engram-复盘-2026-09.md)
