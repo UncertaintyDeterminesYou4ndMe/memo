@@ -152,3 +152,4 @@ V4.1 报告第 5.1.3 节对 DSec 的描述和本文有几处对得上，也有�
 - 3FS：github.com/deepseek-ai/3fs
 - V4.1-Flash 笔记：[DeepSeek-V4.1-Flash](deepseek-v4.1-flash-KV-cache压缩到极限.md)
 - 科普讲解页：https://claude.ai/artifact/88ngBD4GksgsMbsURvTo6d
+- 讲解页仓库内版本：[explainer/deepseek-dsec.html](explainer/deepseek-dsec.html)

@@ -192,3 +192,5 @@ KV 压缩有三个可乘的维度：每条 entry 的大小（MLA/GQA）、序列
 
 - [从雕花论到Engram 五周后复盘](../memory/scaling轴迁移与持续学习-从雕花论到Engram-复盘-2026-09.md)
 - [Scaling 轴迁移与持续学习：从雕花论到 Engram](../memory/scaling轴迁移与持续学习-从雕花论到Engram.md)
+- 科普讲解页：https://claude.ai/code/artifact/1d78d168-2769-414a-acf3-f4d96a3b4ebc
+- 讲解页仓库内版本：[explainer/deepseek-v4.1-flash.html](explainer/deepseek-v4.1-flash.html)
