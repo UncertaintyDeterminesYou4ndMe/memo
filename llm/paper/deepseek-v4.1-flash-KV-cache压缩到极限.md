@@ -1,7 +1,7 @@
 # DeepSeek-V4.1-Flash 阅读笔记
 
 - 论文：*DeepSeek-V4.1-Flash: Pushing the Limits of KV Cache Compression*，DeepSeek-AI，2026 年 9 月
-- 来源：Hugging Face 仓库 `deepseek-ai/DeepSeek-V4.1-Flash` 内的 `DeepSeek_V41_Tech_Report.pdf`（51 页），截至 2026-09-10 尚未上 arXiv
+- 来源：Hugging Face 仓库 `deepseek-ai/DeepSeek-V4.1-Flash` 内的 `DeepSeek_V41_Tech_Report.pdf`（51 页）。9 月下旬已上 arXiv：2609.19969
 - PDF 本地存放在 `~/code/LLM-paper/deepseek-v4.1-flash/`，未入库
 - 前置论文：DeepSeek-V4（arXiv 2606.19348，本地 `~/code/LLM-paper/deepseek-v4/`）。V4.1 是 V4 的增量版本，CSA/HCA、mHC、Engram、Muon 等概念都默认读者已知。
 
@@ -120,6 +120,8 @@ KV 压缩有三个可乘的维度：每条 entry 的大小（MLA/GQA）、序列
 - **模型合并**用来接续 RL：把不同 scaffold / 配置的 checkpoint 合并后作为下一轮 RL 的起点，图中断开的曲线段就是这样来的。
 
 ### 5.1.3 DSec 沙箱平台
+
+2026-09-19 DeepSeek 单独发了 DSec 的完整论文（arXiv 2609.22978），见 [DSec 笔记](deepseek-dsec-智能体训练沙箱平台.md)。下面几条和那篇有出入，已在 DSec 笔记里对照。
 
 - 百万级并发沙箱。不用 Kubernetes，自研放置引擎，多副本无同步协调，牺牲全局一致性换扩展性，节点本地做硬性准入检查。
 - 节点级：按 sub-NUMA 分区绑 worker VM，单物理节点并发容器从约 1000 提到 2500 以上。对延迟敏感任务用 SCHED_IDLE + core scheduling 隔离。
